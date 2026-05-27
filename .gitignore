@@ -1,0 +1,13 @@
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+*.rsuser
+.env
+.env.*
+!.env.example
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/

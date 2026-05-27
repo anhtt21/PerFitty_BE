@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Hnanut.PerFitty.Api/Hnanut.PerFitty.Api.csproj" />
+    <Project Path="src/Hnanut.PerFitty.Application/Hnanut.PerFitty.Application.csproj" />
+    <Project Path="src/Hnanut.PerFitty.Domain/Hnanut.PerFitty.Domain.csproj" />
+    <Project Path="src/Hnanut.PerFitty.Infrastructure/Hnanut.PerFitty.Infrastructure.csproj" />
+    <Project Path="src/Hnanut.PerFitty.SharedKernel/Hnanut.PerFitty.SharedKernel.csproj" />
+  </Folder>
+</Solution>
