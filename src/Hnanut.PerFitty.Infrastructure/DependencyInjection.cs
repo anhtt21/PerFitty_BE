@@ -1,3 +1,5 @@
+using Hnanut.PerFitty.Application.Abstractions.Auth;
+using Hnanut.PerFitty.Infrastructure.Auth;
 using Hnanut.PerFitty.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +26,12 @@ public static class DependencyInjection
                     errorNumbersToAdd: null);
             });
         });
+
+        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+
+        services.AddScoped<IUserRepository, EfUserRepository>();
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<IAuthTokenService, JwtAuthTokenService>();
 
         return services;
     }
