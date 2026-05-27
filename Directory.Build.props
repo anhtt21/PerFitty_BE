@@ -3,5 +3,10 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <AnalysisMode>Recommended</AnalysisMode>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory).artifacts\obj\$(MSBuildProjectName)\</BaseIntermediateOutputPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory).artifacts\bin\$(MSBuildProjectName)\</BaseOutputPath>
+
+    <UseSharedCompilation>false</UseSharedCompilation>
   </PropertyGroup>
 </Project>

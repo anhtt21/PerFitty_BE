@@ -30,18 +30,18 @@ public sealed class AuthService : IAuthService
     {
         if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
         {
-            return AuthResult<AuthTokenResponse>.Failure("invalid_register_request", "Email and password are required.");
+            return AuthResult.Failure<AuthTokenResponse>("invalid_register_request", "Email and password are required.");
         }
 
         if (request.Password.Length < 8)
         {
-            return AuthResult<AuthTokenResponse>.Failure("weak_password", "Password must be at least 8 characters.");
+            return AuthResult.Failure<AuthTokenResponse>("weak_password", "Password must be at least 8 characters.");
         }
 
         var normalizedEmail = NormalizeEmail(request.Email);
         if (await _users.EmailExistsAsync(normalizedEmail, cancellationToken))
         {
-            return AuthResult<AuthTokenResponse>.Failure("email_already_exists", "Email is already registered.");
+            return AuthResult.Failure<AuthTokenResponse>("email_already_exists", "Email is already registered.");
         }
 
         var now = _clock.UtcNow;
@@ -63,7 +63,7 @@ public sealed class AuthService : IAuthService
         await _users.AddRefreshTokenAsync(refreshToken, cancellationToken);
         await _users.SaveChangesAsync(cancellationToken);
 
-        return AuthResult<AuthTokenResponse>.Success(CreateResponse(user, accessToken, refreshSecret));
+        return AuthResult.Success(CreateResponse(user, accessToken, refreshSecret));
     }
 
     public async Task<AuthResult<AuthTokenResponse>> LoginAsync(
@@ -76,12 +76,12 @@ public sealed class AuthService : IAuthService
 
         if (user is null || !_passwordHasher.Verify(request.Password, user.PasswordHash))
         {
-            return AuthResult<AuthTokenResponse>.Failure("invalid_credentials", "Email or password is incorrect.");
+            return AuthResult.Failure<AuthTokenResponse>("invalid_credentials", "Email or password is incorrect.");
         }
 
         if (user.IsDisabled)
         {
-            return AuthResult<AuthTokenResponse>.Failure("account_disabled", "This account is disabled.");
+            return AuthResult.Failure<AuthTokenResponse>("account_disabled", "This account is disabled.");
         }
 
         var now = _clock.UtcNow;
@@ -103,7 +103,7 @@ public sealed class AuthService : IAuthService
         await _users.AddRefreshTokenAsync(refreshToken, cancellationToken);
         await _users.SaveChangesAsync(cancellationToken);
 
-        return AuthResult<AuthTokenResponse>.Success(CreateResponse(user, accessToken, refreshSecret));
+        return AuthResult.Success(CreateResponse(user, accessToken, refreshSecret));
     }
 
     public async Task<AuthResult<AuthTokenResponse>> RefreshAsync(
@@ -113,7 +113,7 @@ public sealed class AuthService : IAuthService
     {
         if (string.IsNullOrWhiteSpace(request.RefreshToken))
         {
-            return AuthResult<AuthTokenResponse>.Failure("invalid_refresh_token", "Refresh token is required.");
+            return AuthResult.Failure<AuthTokenResponse>("invalid_refresh_token", "Refresh token is required.");
         }
 
         var now = _clock.UtcNow;
@@ -122,13 +122,13 @@ public sealed class AuthService : IAuthService
 
         if (oldToken is null || !oldToken.IsActive(now))
         {
-            return AuthResult<AuthTokenResponse>.Failure("invalid_refresh_token", "Refresh token is invalid or expired.");
+            return AuthResult.Failure<AuthTokenResponse>("invalid_refresh_token", "Refresh token is invalid or expired.");
         }
 
         var user = await _users.FindByIdAsync(oldToken.UserId, cancellationToken);
         if (user is null || user.IsDisabled)
         {
-            return AuthResult<AuthTokenResponse>.Failure("invalid_refresh_token", "Refresh token is invalid.");
+            return AuthResult.Failure<AuthTokenResponse>("invalid_refresh_token", "Refresh token is invalid.");
         }
 
         var accessToken = _tokenService.CreateAccessToken(user, now);
@@ -149,7 +149,7 @@ public sealed class AuthService : IAuthService
         await _users.AddRefreshTokenAsync(newRefreshToken, cancellationToken);
         await _users.SaveChangesAsync(cancellationToken);
 
-        return AuthResult<AuthTokenResponse>.Success(CreateResponse(user, accessToken, refreshSecret));
+        return AuthResult.Success(CreateResponse(user, accessToken, refreshSecret));
     }
 
     public async Task<AuthResult<LogoutResponse>> LogoutAsync(
@@ -169,7 +169,7 @@ public sealed class AuthService : IAuthService
             }
         }
 
-        return AuthResult<LogoutResponse>.Success(new LogoutResponse(true));
+        return AuthResult.Success(new LogoutResponse(true));
     }
 
     public async Task<AuthResult<CurrentUserResponse>> GetCurrentUserAsync(
@@ -179,8 +179,8 @@ public sealed class AuthService : IAuthService
         var user = await _users.FindByIdAsync(userId, cancellationToken);
 
         return user is null
-            ? AuthResult<CurrentUserResponse>.Failure("user_not_found", "User was not found.")
-            : AuthResult<CurrentUserResponse>.Success(AuthResponseMapper.ToCurrentUserResponse(user));
+            ? AuthResult.Failure<CurrentUserResponse>("user_not_found", "User was not found.")
+            : AuthResult.Success(AuthResponseMapper.ToCurrentUserResponse(user));
     }
 
     private static AuthTokenResponse CreateResponse(

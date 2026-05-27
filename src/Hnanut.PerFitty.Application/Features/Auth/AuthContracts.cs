@@ -53,7 +53,7 @@ public sealed record AuthFailure(string Code, string Message);
 
 public sealed class AuthResult<T>
 {
-    private AuthResult(T? value, AuthFailure? error)
+    internal AuthResult(T? value, AuthFailure? error)
     {
         Value = value;
         Error = error;
@@ -64,10 +64,13 @@ public sealed class AuthResult<T>
     public AuthFailure? Error { get; }
 
     public bool Succeeded => Error is null;
+}
 
-    public static AuthResult<T> Success(T value) => new(value, null);
+public static class AuthResult
+{
+    public static AuthResult<T> Success<T>(T value) => new(value, null);
 
-    public static AuthResult<T> Failure(string code, string message)
+    public static AuthResult<T> Failure<T>(string code, string message)
         => new(default, new AuthFailure(code, message));
 }
 

@@ -6,12 +6,45 @@ using Hnanut.PerFitty.Infrastructure;
 using Hnanut.PerFitty.Infrastructure.Auth;
 using Hnanut.PerFitty.SharedKernel.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
+
+var dataProtectionKeysPath = Path.GetFullPath(
+    Path.Combine(builder.Environment.ContentRootPath, "..", "..", ".artifacts", "data-protection-keys"));
+Directory.CreateDirectory(dataProtectionKeysPath);
+
+builder.Services
+    .AddDataProtection()
+    .SetApplicationName("PerFitty")
+    .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionKeysPath));
+
+const string corsPolicyName = "PerFittyWebClient";
+var allowedOrigins = builder.Configuration
+    .GetSection("Cors:AllowedOrigins")
+    .Get<string[]>()
+    ?? [];
+
+if (allowedOrigins.Length > 0)
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(
+            corsPolicyName,
+            policy => policy
+                .WithOrigins(allowedOrigins)
+                .AllowAnyHeader()
+                .AllowAnyMethod());
+    });
+}
 
 var jwtOptions = builder.Configuration
     .GetSection(JwtOptions.SectionName)
@@ -70,6 +103,11 @@ app.MapGet("/api/health", () =>
     }))
     .WithName("GetApiHealth")
     .WithTags("Health");
+
+if (allowedOrigins.Length > 0)
+{
+    app.UseCors(corsPolicyName);
+}
 
 app.UseAuthentication();
 app.UseAuthorization();
