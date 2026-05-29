@@ -10,17 +10,20 @@ public sealed class AuthService : IAuthService
     private readonly IPasswordHasher _passwordHasher;
     private readonly IAuthTokenService _tokenService;
     private readonly IClock _clock;
+    private readonly IPersistenceAvailabilityProbe _persistenceAvailability;
 
     public AuthService(
         IUserRepository users,
         IPasswordHasher passwordHasher,
         IAuthTokenService tokenService,
-        IClock clock)
+        IClock clock,
+        IPersistenceAvailabilityProbe persistenceAvailability)
     {
         _users = users;
         _passwordHasher = passwordHasher;
         _tokenService = tokenService;
         _clock = clock;
+        _persistenceAvailability = persistenceAvailability;
     }
 
     public async Task<AuthResult<AuthTokenResponse>> RegisterAsync(
@@ -39,6 +42,11 @@ public sealed class AuthService : IAuthService
         }
 
         var normalizedEmail = NormalizeEmail(request.Email);
+        if (!await _persistenceAvailability.IsAvailableAsync(cancellationToken))
+        {
+            return AuthResult.Failure<AuthTokenResponse>("database_unavailable", "Database is unavailable.");
+        }
+
         if (await _users.EmailExistsAsync(normalizedEmail, cancellationToken))
         {
             return AuthResult.Failure<AuthTokenResponse>("email_already_exists", "Email is already registered.");
@@ -72,6 +80,11 @@ public sealed class AuthService : IAuthService
         CancellationToken cancellationToken)
     {
         var normalizedEmail = NormalizeEmail(request.Email);
+        if (!await _persistenceAvailability.IsAvailableAsync(cancellationToken))
+        {
+            return AuthResult.Failure<AuthTokenResponse>("database_unavailable", "Database is unavailable.");
+        }
+
         var user = await _users.FindByEmailAsync(normalizedEmail, cancellationToken);
 
         if (user is null || !_passwordHasher.Verify(request.Password, user.PasswordHash))

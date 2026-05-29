@@ -31,20 +31,22 @@ const string corsPolicyName = "PerFittyWebClient";
 var allowedOrigins = builder.Configuration
     .GetSection("Cors:AllowedOrigins")
     .Get<string[]>()
-    ?? [];
+    ?? [
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
+        "http://localhost:19006",
+        "http://127.0.0.1:19006"
+    ];
 
-if (allowedOrigins.Length > 0)
+builder.Services.AddCors(options =>
 {
-    builder.Services.AddCors(options =>
-    {
-        options.AddPolicy(
-            corsPolicyName,
-            policy => policy
-                .WithOrigins(allowedOrigins)
-                .AllowAnyHeader()
-                .AllowAnyMethod());
-    });
-}
+    options.AddPolicy(
+        corsPolicyName,
+        policy => policy
+            .WithOrigins(allowedOrigins)
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
 
 var jwtOptions = builder.Configuration
     .GetSection(JwtOptions.SectionName)
@@ -104,10 +106,7 @@ app.MapGet("/api/health", () =>
     .WithName("GetApiHealth")
     .WithTags("Health");
 
-if (allowedOrigins.Length > 0)
-{
-    app.UseCors(corsPolicyName);
-}
+app.UseCors(corsPolicyName);
 
 app.UseAuthentication();
 app.UseAuthorization();

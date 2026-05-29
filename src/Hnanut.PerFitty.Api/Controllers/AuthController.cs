@@ -118,6 +118,7 @@ public sealed class AuthController : ControllerBase
             "invalid_credentials" => Unauthorized(ApiResponse.Failure<T>(error)),
             "invalid_refresh_token" => Unauthorized(ApiResponse.Failure<T>(error)),
             "account_disabled" => Forbid(),
+            "database_unavailable" => StatusCode(StatusCodes.Status503ServiceUnavailable, ApiResponse.Failure<T>(error)),
             "user_not_found" => NotFound(ApiResponse.Failure<T>(error)),
             _ => BadRequest(ApiResponse.Failure<T>(error))
         };

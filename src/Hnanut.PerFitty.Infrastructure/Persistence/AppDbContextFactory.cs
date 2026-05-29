@@ -9,7 +9,7 @@ public sealed class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
     {
         var connectionString =
             Environment.GetEnvironmentVariable("PERFITTY_CONNECTION_STRING")
-            ?? "Server=localhost,1433;Database=PerFitty;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;Encrypt=False";
+            ?? "Server=localhost,1433;Database=PerFitty;User Id=sa;Password=Tanh0201@;TrustServerCertificate=True;Encrypt=False;Connect Timeout=5";
 
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlServer(connectionString, sqlOptions =>
