@@ -167,13 +167,13 @@ public sealed class ProfileService : IProfileService
             AllowedStyles.OrderBy(value => value).ToArray(),
             AllowedOccasions.OrderBy(value => value).ToArray());
 
-    private static IReadOnlyCollection<string> Normalize(IReadOnlyCollection<string>? values)
-        => values?
-            .Where(value => !string.IsNullOrWhiteSpace(value))
-            .Select(value => value.Trim().ToLowerInvariant())
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToArray()
-            ?? [];
+    private static string[] Normalize(IReadOnlyCollection<string>? values)
+    => values?
+        .Where(value => !string.IsNullOrWhiteSpace(value))
+        .Select(value => value.Trim().ToLowerInvariant())
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToArray()
+        ?? [];
 
     private static string? EmptyToNull(string? value)
         => string.IsNullOrWhiteSpace(value) ? null : value.Trim();
