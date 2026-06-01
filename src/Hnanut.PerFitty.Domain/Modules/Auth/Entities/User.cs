@@ -32,6 +32,8 @@ public sealed class User : Entity, IAuditableEntity
 
     public UserProfile? Profile { get; private set; }
 
+    public UserStylePreference? StylePreference { get; private set; }
+
     public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;

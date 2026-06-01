@@ -5,6 +5,7 @@ using Hnanut.PerFitty.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Hnanut.PerFitty.Application.Abstractions.Profile;
 
 namespace Hnanut.PerFitty.Infrastructure;
 
@@ -35,6 +36,7 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, EfUserRepository>();
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
         services.AddScoped<IAuthTokenService, JwtAuthTokenService>();
+        services.AddScoped<IProfileRepository, EfProfileRepository>();
 
         return services;
     }

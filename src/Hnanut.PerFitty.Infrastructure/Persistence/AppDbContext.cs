@@ -27,4 +27,8 @@ public sealed class AppDbContext : DbContext
 
         base.OnModelCreating(modelBuilder);
     }
+
+    public DbSet<UserStylePreference> UserStylePreferences => Set<UserStylePreference>();
+
+    public DbSet<UserStylePreferenceValue> UserStylePreferenceValues => Set<UserStylePreferenceValue>();
 }
